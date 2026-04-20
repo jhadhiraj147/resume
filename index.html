@@ -3,383 +3,573 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dhiraj Jha - Software Engineer</title>
+    <title>Dhiraj Jha | Systems Engineer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        darkBg: '#0a192f',
-                        accent: '#64ffda',
-                        textPrimary: '#ccd6f6',
-                        textSecondary: '#8892b0',
-                        surface: '#112240',
-                        surfaceLight: '#233554'
+                        bgDark: '#050510',
+                        neonCyan: '#00f3ff',
+                        neonPurple: '#b000ff',
+                        glassBg: 'rgba(20, 20, 35, 0.4)',
+                        textMuted: '#8b8baf'
                     },
                     fontFamily: {
-                        sans: ['Calibre', 'Inter', 'San Francisco', 'SF Pro Text', '-apple-system', 'system-ui', 'sans-serif'],
-                        mono: ['SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', 'monospace']
+                        mono: ['Fira Code', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
         }
     </script>
     <style>
-        body { scroll-behavior: smooth; cursor: none; }
-        .glass-panel { background: rgba(17, 34, 64, 0.7); backdrop-filter: blur(10px); }
-        .glass-panel:hover { background: rgba(35, 53, 84, 0.9); }
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&family=Inter:wght@300;400;700;900&display=swap');
         
-        .cursor-dot { width: 8px; height: 8px; background-color: #64ffda; }
-        .cursor-outline {
-            width: 40px; height: 40px;
-            border: 1px solid rgba(100, 255, 218, 0.5);
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
-        }
-        .cursor-dot, .cursor-outline {
-            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-            border-radius: 50%; z-index: 9999; pointer-events: none;
-        }
-        
-        .text-gradient {
-            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(90deg, #64ffda, #48cae4);
+        body {
+            background-color: #050510;
+            color: #ffffff;
+            overflow-x: hidden;
+            cursor: none; /* Custom cursor */
         }
 
-        ::-moz-selection { background: rgba(100, 255, 218, 0.2); color: #ccd6f6; }
-        ::selection { background: rgba(100, 255, 218, 0.2); color: #ccd6f6; }
-        
-        .gsap-reveal { opacity: 0; visibility: hidden; }
+        /* 3D Network Canvas */
+        #network-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(20, 20, 35, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(176, 0, 255, 0.2);
+        }
+
+        /* Cyber Glitch Text Effect */
+        .glitch-hover:hover {
+            animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+            color: #00f3ff;
+            text-shadow: 2px 2px #b000ff, -2px -2px #00f3ff;
+        }
+
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); }
+        }
+
+        /* Gradient Text */
+        .cyber-gradient {
+            background: linear-gradient(to right, #00f3ff, #b000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom Magnetic Cursor */
+        #cursor-dot {
+            width: 8px; height: 8px; background: #00f3ff;
+            border-radius: 50%; opacity: 1; z-index: 10000;
+        }
+        #cursor-ring {
+            width: 40px; height: 40px;
+            border: 1px solid #00f3ff;
+            box-shadow: 0 0 10px #00f3ff;
+            border-radius: 50%; z-index: 9999;
+            transition: width 0.3s, height 0.3s, border-color 0.3s;
+        }
+        .cursor-part { position: fixed; pointer-events: none; transform: translate(-50%, -50%); }
+
+        /* Fancy Typewriter Cursor */
+        .type-cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+            color: #00f3ff;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Floating Animation */
+        .float-obj { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn { display: inline-block; position: relative; }
+        .magnetic-inner { pointer-events: none; }
     </style>
 </head>
-<body class="bg-darkBg text-textSecondary font-sans overflow-x-hidden relative">
+<body class="antialiased selection:bg-neonCyan selection:text-bgDark">
+
+    <!-- Background Interactive Network -->
+    <canvas id="network-bg"></canvas>
 
     <!-- Custom Cursor -->
-    <div class="cursor-dot hidden md:block"></div>
-    <div class="cursor-outline hidden md:block"></div>
+    <div id="cursor-dot" class="cursor-part"></div>
+    <div id="cursor-ring" class="cursor-part"></div>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass-panel py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-300" id="navbar">
-        <a href="#" class="text-accent font-mono text-xl font-bold tracking-widest hover:scale-110 transition-transform">DJ.</a>
-        
-        <div class="hidden md:flex items-center gap-8 font-mono text-sm">
-            <a href="#about" class="hover:text-accent transition-colors"><span class="text-accent mr-1">01.</span>About</a>
-            <a href="#experience" class="hover:text-accent transition-colors"><span class="text-accent mr-1">02.</span>Experience</a>
-            <a href="#projects" class="hover:text-accent transition-colors"><span class="text-accent mr-1">03.</span>Work</a>
-            <a href="#contact" class="hover:text-accent transition-colors"><span class="text-accent mr-1">04.</span>Contact</a>
-            
-            <a href="/Users/jhadhiraj147/Downloads/JobApply/jha_dhiraj_resume_13April2026.pdf" target="_blank" 
-               class="px-4 py-2 border border-accent text-accent rounded hover:bg-accent/10 transition-colors">
-               Resume
-            </a>
-        </div>
-        <button class="md:hidden text-accent text-2xl focus:outline-none"><i class="fas fa-bars"></i></button>
+    <!-- Floating Navigation -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 glass-card px-8 py-3 rounded-full flex gap-8 font-mono text-sm tracking-wide shadow-[0_0_20px_rgba(0,243,255,0.15)]">
+        <a href="#about" class="hover:text-neonCyan transition-all hover:scale-110">System_Specs</a>
+        <a href="#experience" class="hover:text-neonCyan transition-all hover:scale-110">Telemetry</a>
+        <a href="#projects" class="hover:text-neonCyan transition-all hover:scale-110">Modules</a>
+        <a href="/Users/jhadhiraj147/Downloads/JobApply/jha_dhiraj_resume_13April2026.pdf" target="_blank" class="text-neonPurple hover:text-neonCyan transition-colors"><i class="fas fa-download"></i> Extract.pdf</a>
     </nav>
 
-    <!-- Side Social Links -->
-    <div class="fixed left-10 bottom-0 z-40 hidden lg:flex flex-col items-center gap-6 after:content-[''] after:w-[1px] after:h-24 after:bg-textSecondary">
-        <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-accent hover:-translate-y-1 transition-all duration-300"><i class="fab fa-github text-xl"></i></a>
-        <a href="https://linkedin.com/in/jhadhiraj147" target="_blank" class="hover:text-accent hover:-translate-y-1 transition-all duration-300"><i class="fab fa-linkedin text-xl"></i></a>
+    <!-- Social Sidebar -->
+    <div class="fixed right-6 bottom-12 z-40 hidden lg:flex flex-col gap-6 text-xl">
+        <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-neonCyan transition-all transform hover:-translate-x-2"><i class="fab fa-github"></i></a>
+        <a href="https://linkedin.com/in/jhadhiraj147" target="_blank" class="hover:text-neonCyan transition-all transform hover:-translate-x-2"><i class="fab fa-linkedin"></i></a>
+        <div class="w-[1px] h-20 bg-gradient-to-b from-neonCyan to-transparent mx-auto"></div>
     </div>
 
-    <!-- Right Email Link -->
-    <div class="fixed right-10 bottom-0 z-40 hidden lg:flex flex-col items-center gap-6 after:content-[''] after:w-[1px] after:h-24 after:bg-textSecondary">
-        <a href="mailto:jhadhiraj147@gmail.com" class="font-mono text-sm tracking-widest hover:text-accent hover:-translate-y-1 transition-all duration-300" style="writing-mode: vertical-rl;">
-            jhadhiraj147@gmail.com
-        </a>
-    </div>
-
-    <main class="px-6 md:px-24 lg:px-48 xl:px-64 max-w-[1600px] mx-auto">
+    <!-- Main Container -->
+    <main class="w-full max-w-7xl mx-auto px-6 md:px-16 pt-32 pb-20 relative z-10">
         
         <!-- Hero Section -->
-        <section id="hero" class="min-h-screen flex flex-col justify-center pt-20">
-            <div class="gsap-reveal intro-elem text-accent font-mono mb-6 ml-1 text-sm md:text-base">Hi, my name is</div>
-            <h1 class="gsap-reveal intro-elem text-5xl md:text-7xl font-bold text-textPrimary mb-4 tracking-tight">
-                Dhiraj Jha.
+        <section class="min-h-[85vh] flex flex-col justify-center relative">
+            <div class="absolute right-0 top-1/4 opacity-20 hidden md:block float-obj">
+                <i class="fas fa-network-wired text-[20rem] text-neonCyan"></i>
+            </div>
+
+            <p class="font-mono text-neonCyan mb-4 text-lg gs-reveal">> INIT ROOT_ACCESS: Dhiraj.Jha</p>
+            
+            <h1 class="text-6xl md:text-8xl font-black mb-2 tracking-tight uppercase glitch-hover gs-reveal">
+                Dhiraj Jha
             </h1>
-            <h2 class="gsap-reveal intro-elem text-4xl md:text-6xl font-bold text-textSecondary mb-8 tracking-tight">
-                I build robust, scalable backend systems.
+            
+            <h2 class="text-3xl md:text-5xl font-bold text-textMuted mb-8 gs-reveal">
+                Architecting <span class="cyber-gradient type-cursor" id="typewriter"></span>
             </h2>
-            <p class="gsap-reveal intro-elem max-w-2xl text-lg leading-relaxed mb-12">
-                I'm a software engineer and Presidential Scholar at Fisk University, specializing in Go, distributed systems, microservices architecture, and cloud infrastructure. Rank 7 Nationwide (Finalist) in the Nepal Olympiad in Informatics.
+            
+            <p class="max-w-2xl text-lg text-textMuted leading-relaxed mb-10 gs-reveal">
+                Presidential Scholar at Fisk University. Former Google Intern. 
+                Specializing in Go, C++, Distributed Systems, and highly scalable microservices.
+                Rank 7 Nationwide (Finalist) in the Nepal Olympiad in Informatics.
             </p>
-            <div class="gsap-reveal intro-elem flex gap-4">
-                <a href="#experience" class="inline-block px-8 py-4 border-2 border-accent text-accent rounded font-mono text-sm hover:bg-accent/10 transition-colors">
-                    Check out my experience!
+            
+            <div class="flex gap-6 gs-reveal font-mono">
+                <a href="#experience" class="magnetic-btn glass-card px-8 py-4 rounded hover:bg-neonCyan/10 border border-neonCyan text-neonCyan group transition-all">
+                    <span class="magnetic-inner flex items-center gap-2">
+                        Execute_Workflow() <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+                    </span>
                 </a>
             </div>
         </section>
 
-        <!-- About / Education / Skills Section -->
-        <section id="about" class="py-24 max-w-3xl">
-            <h2 class="gsap-reveal flex items-center gap-4 text-2xl md:text-3xl font-bold text-textPrimary mb-10 whitespace-nowrap">
-                <span class="text-accent font-mono font-normal text-xl md:text-2xl">01.</span> About Me
-                <div class="h-[1px] bg-surfaceLight w-full md:w-64 ml-4"></div>
-            </h2>
-            
-            <div class="gsap-reveal space-y-6 text-lg mb-12">
-                <p>Hello! I'm Dhiraj, currently pursuing my B.S. in Computer Science & B.A. in Mathematics at <strong>Fisk University</strong> (Nashville, TN) as a Presidential Scholar, graduating in May 2028.</p>
-                <p>My academic foundation includes Software Designs, Computer Networks, Algorithms, Data Structures, Theory of Computation, Linear Algebra, Real Analysis, and more. Beyond the classroom, I serve as the <strong>Vice President of the Fisk Mathematics Club</strong>.</p>
-                <p>I also have a strong competitive programming background, achieving Rank 7 Nationwide in the Nepal Olympiad in Informatics (2022) and Rank 48 Nationwide in the Nepal Mathematical Olympiad (2022).</p>
+        <!-- Stats / Tech Stack Grid (Tilt Cards) -->
+        <section id="about" class="py-24 relative z-10">
+            <div class="flex items-center gap-4 mb-16 gs-reveal">
+                <h2 class="text-4xl font-bold font-mono uppercase tracking-widest"><span class="text-neonPurple">01.</span> System_Specs</h2>
+                <div class="h-[1px] flex-grow bg-gradient-to-r from-neonPurple to-transparent"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-mono text-sm gs-reveal-stagger">
                 
-                <h3 class="text-textPrimary font-bold text-xl mt-8 pt-4">Tech Stack</h3>
-                <div class="grid md:grid-cols-2 gap-4 font-mono text-sm mt-4">
-                    <div>
-                        <p class="text-accent mb-2">Languages:</p>
-                        <ul class="space-y-1">
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">Go*</li>
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">C / C++</li>
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">Python</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <p class="text-accent mb-2">Data & Storage:</p>
-                        <ul class="space-y-1">
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">PostgreSQL, MongoDB</li>
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">DynamoDB, Redis, Prisma</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="grid md:grid-cols-2 gap-4 font-mono text-sm mt-4">
-                    <div>
-                        <p class="text-accent mb-2">Systems:</p>
-                        <ul class="space-y-1">
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">REST, RPC, GraphQL, WS</li>
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">Kafka, Flink, RabbitMQ, ZeroMQ</li>
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">TCP/IP/UDP, Design Patterns</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <p class="text-accent mb-2">Cloud & Infra:</p>
-                        <ul class="space-y-1">
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">Docker, K8s, AWS, GCP</li>
-                            <li class="flex items-center before:content-['▹'] before:text-accent before:mr-2">Linux, CI/CD, Git</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Experience Section -->
-        <section id="experience" class="py-24 max-w-3xl">
-            <h2 class="gsap-reveal flex items-center gap-4 text-2xl md:text-3xl font-bold text-textPrimary mb-10 whitespace-nowrap">
-                <span class="text-accent font-mono font-normal text-xl md:text-2xl">02.</span> Industry Experience
-                <div class="h-[1px] bg-surfaceLight w-full md:w-64 ml-4"></div>
-            </h2>
-            
-            <div class="space-y-16">
-                <!-- Google -->
-                <div class="gsap-reveal w-full relative pl-6 border-l-2 border-surfaceLight hover:border-accent transition-colors duration-300">
-                    <div class="absolute w-3 h-3 bg-darkBg border-2 border-accent rounded-full -left-[7px] top-2"></div>
-                    <h3 class="text-xl text-textPrimary font-bold">Associate Software Developer Intern <span class="text-accent">@ Google</span></h3>
-                    <p class="font-mono text-sm mb-6 mt-1 text-textSecondary">May 2025 - Aug 2025 | Sunnyvale, California</p>
-                    <p class="mb-4 italic text-sm text-textPrimary/80">Project: Automated Google's PRICE (Production Risks in Core Eng.) program assessing systems' health.</p>
-                    <ul class="space-y-3 text-[17px] text-textSecondary">
-                        <li class="relative pl-6 before:content-['▹'] before:absolute before:left-0 before:text-accent">Reduced PRICE assessment time by 99% (3 days → 15 mins) by building the automated tool PRICELESS.</li>
-                        <li class="relative pl-6 before:content-['▹'] before:absolute before:left-0 before:text-accent">Eliminated 100% of human effort otherwise spent on emailing, reporting, manually creating/tracking bugs, and checking updates by automating the workflow with Gmail, Bug, Google Docs APIs, etc.</li>
-                        <li class="relative pl-6 before:content-['▹'] before:absolute before:left-0 before:text-accent">Implemented a RAG pipeline to ground LLM (Goose Model) outputs in Site Reliability Engineering's principles, controlling hallucination and standardizing end report.</li>
-                        <li class="relative pl-6 before:content-['▹'] before:absolute before:left-0 before:text-accent">Resolved permission issues by embedding auto-authentication logic, wrote tests, and prepared for deployment on borg.</li>
+                <!-- Card 1: Core Languages -->
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+                    <div class="absolute -right-4 -top-4 text-6xl text-white/5 group-hover:scale-150 transition-transform duration-500"><i class="fas fa-code"></i></div>
+                    <h3 class="text-neonCyan text-xl font-bold mb-4 border-b border-neonCyan/30 pb-2">Languages</h3>
+                    <ul class="space-y-3 z-10 relative text-gray-300">
+                        <li class="flex justify-between items-center"><span>Go</span> <span class="text-neonCyan">PRIMARY*</span></li>
+                        <li class="flex justify-between items-center"><span>C / C++</span> <span class="bg-white/10 px-2 rounded">Expert</span></li>
+                        <li class="flex justify-between items-center"><span>Python</span> <span class="bg-white/10 px-2 rounded">Advanced</span></li>
                     </ul>
                 </div>
 
-                <!-- Dish Media -->
-                <div class="gsap-reveal w-full relative pl-6 border-l-2 border-surfaceLight hover:border-accent transition-colors duration-300">
-                    <div class="absolute w-3 h-3 bg-darkBg border-2 border-accent rounded-full -left-[7px] top-2"></div>
-                    <h3 class="text-xl text-textPrimary font-bold">Network Technician Intern <span class="text-accent">@ Dish Media Network</span></h3>
-                    <p class="font-mono text-sm mb-6 mt-1 text-textSecondary">Dec 2023 - Mar 2024 | Kathmandu, Nepal</p>
-                    
-                    <ul class="space-y-3 text-[17px] text-textSecondary">
-                        <li class="relative pl-6 before:content-['▹'] before:absolute before:left-0 before:text-accent">Configured 10+ routers for commercial clients and installed 2 distribution boxes in residential areas.</li>
-                        <li class="relative pl-6 before:content-['▹'] before:absolute before:left-0 before:text-accent">Assisted with on-field work, maintaining cable infrastructure; performed wiring and installation of switches and CCTVs.</li>
-                        <li class="relative pl-6 before:content-['▹'] before:absolute before:left-0 before:text-accent">Conducted regular network setup and maintenance; maintained documentation for diagnosis and troubleshooting.</li>
+                <!-- Card 2: Systems -->
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+                    <div class="absolute -right-4 -top-4 text-6xl text-white/5 group-hover:scale-150 transition-transform duration-500"><i class="fas fa-project-diagram"></i></div>
+                    <h3 class="text-neonPurple text-xl font-bold mb-4 border-b border-neonPurple/30 pb-2">Systems</h3>
+                    <div class="flex flex-wrap gap-2 z-10 relative">
+                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">REST / RPC</span>
+                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">GraphQL / WS</span>
+                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">Kafka / Flink</span>
+                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">RabbitMQ</span>
+                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">ZeroMQ</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: DBs -->
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+                    <div class="absolute -right-4 -top-4 text-6xl text-white/5 group-hover:scale-150 transition-transform duration-500"><i class="fas fa-database"></i></div>
+                    <h3 class="text-neonCyan text-xl font-bold mb-4 border-b border-neonCyan/30 pb-2">Storage</h3>
+                    <ul class="space-y-3 z-10 relative text-gray-300">
+                        <li>PostgreSQL</li>
+                        <li>MongoDB</li>
+                        <li>DynamoDB</li>
+                        <li>Redis / Prisma</li>
                     </ul>
                 </div>
+
+                <!-- Card 4: Infra -->
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+                    <div class="absolute -right-4 -top-4 text-6xl text-white/5 group-hover:scale-150 transition-transform duration-500"><i class="fas fa-cloud"></i></div>
+                    <h3 class="text-neonPurple text-xl font-bold mb-4 border-b border-neonPurple/30 pb-2">Cloud & Infra</h3>
+                    <ul class="space-y-3 z-10 relative text-gray-300">
+                        <li>Docker / K8s</li>
+                        <li>AWS / GCP</li>
+                        <li>Linux Admin</li>
+                        <li>CI/CD Pipelines</li>
+                    </ul>
+                </div>
+
             </div>
         </section>
 
-        <!-- Projects Section -->
-        <section id="projects" class="py-24 max-w-4xl">
-            <h2 class="gsap-reveal flex items-center gap-4 text-2xl md:text-3xl font-bold text-textPrimary mb-12 whitespace-nowrap">
-                <span class="text-accent font-mono font-normal text-xl md:text-2xl">03.</span> Projects
-                <div class="h-[1px] bg-surfaceLight w-full md:w-[300px] ml-4"></div>
-            </h2>
-            
-            <div class="space-y-24">
-                <!-- Project 1: eShopping -->
-                <div class="gsap-reveal relative grid md:grid-cols-12 items-center group">
-                    <div class="md:col-span-8 relative z-10 glass-panel p-6 md:p-8 rounded md:bg-transparent md:backdrop-filter-none md:p-0 md:row-start-1 md:col-start-1">
-                        <p class="font-mono text-accent text-sm mb-2">Jan 2026</p>
-                        <h3 class="text-textPrimary text-2xl font-bold mb-6 hover:text-accent transition-colors">eShopping for Intelligent Systems</h3>
-                        <div class="md:glass-panel md:p-6 md:rounded shadow-xl text-textSecondary mb-6 md:hover:bg-surfaceLight transition-colors">
-                            <ul class="space-y-3 list-none pl-0">
-                                <li>Built scalable backend microservices in Go using gRPC server framework to enable low-latency communication between ordering, inventory, pricing, and analytics microservices.</li>
-                                <li class="mt-2">Engineered a real-time task dispatch system using ZeroMQ pub-sub architecture, enabling instant, Uber-like communication between the inventory service and warehouse robots.</li>
-                                <li class="mt-2">Coded the API Gateway in REST, exposing endpoints for all client-facing interactions such as logins, history, and payments.</li>
-                            </ul>
-                        </div>
-                        <ul class="flex flex-wrap gap-4 font-mono text-sm text-textSecondary mb-6">
-                            <li>Go</li>
-                            <li>gRPC</li>
-                            <li>ZeroMQ</li>
-                            <li>REST</li>
-                            <li>Microservices</li>
-                        </ul>
-                        <div class="flex gap-4">
-                            <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-accent"><i class="fab fa-github text-xl"></i></a>
-                        </div>
+        <!-- Experience Timeline (Cyber/Node Style) -->
+        <section id="experience" class="py-24 relative z-10">
+            <div class="flex items-center gap-4 mb-16 gs-reveal">
+                <div class="h-[1px] flex-grow bg-gradient-to-l from-neonCyan to-transparent"></div>
+                <h2 class="text-4xl font-bold font-mono uppercase tracking-widest"><span class="text-neonCyan">02.</span> Telemetry_Log</h2>
+            </div>
+
+            <div class="relative wrap-timeline">
+                <!-- Glowing central line -->
+                <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-[2px] bg-neonCyan/20 shadow-[0_0_10px_#00f3ff]">
+                    <!-- Pulsing signal running down the line -->
+                    <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-transparent via-neonCyan to-transparent opacity-50 pulse-line"></div>
+                </div>
+
+                <!-- Ex- 1: Google -->
+                <div class="mb-20 flex justify-between items-center w-full flex-col md:flex-row gs-reveal">
+                    <div class="order-1 md:w-5/12 text-right hidden md:block">
+                        <h3 class="text-2xl font-bold glitch-hover">Google</h3>
+                        <p class="font-mono text-neonCyan">Associate Software Developer Intern</p>
+                        <p class="text-sm text-gray-400 mt-1">May 2025 – Aug 2025 | Sunnyvale, CA</p>
                     </div>
-                    <div class="hidden md:block col-span-6 row-start-1 col-start-7 relative opacity-50 group-hover:opacity-100 transition-opacity duration-500 rounded overflow-hidden shadow-2xl">
-                        <div class="w-full h-[350px] bg-surfaceLight flex items-center justify-center border border-accent/20">
-                            <i class="fas fa-shopping-cart text-6xl text-accent/50 group-hover:text-accent transition-colors"></i>
+                    <div class="z-20 flex items-center order-1 bg-bgDark shadow-[0_0_15px_#00f3ff] w-6 h-6 rounded-full border-4 border-neonCyan mb-4 md:mb-0"></div>
+                    <div class="order-1 glass-card p-6 md:w-5/12 rounded-xl relative group data-tilt self-start w-full md:self-auto">
+                        <div class="md:hidden mb-4 border-b border-white/10 pb-4">
+                            <h3 class="text-2xl font-bold text-white">Google</h3>
+                            <p class="font-mono text-neonCyan">Associate Software Developer Intern</p>
+                            <p class="text-xs text-gray-400">May 2025 – Aug 2025</p>
                         </div>
+                        <p class="text-sm font-mono text-neonPurple mb-4">Project: PRICE (Production Risks in Core Eng.)</p>
+                        <ul class="text-gray-300 text-sm space-y-3 leading-relaxed">
+                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonCyan mt-1"></i> Reduced PRICE assessment time by 99% (3 days → 15 mins) by building automated tool PRICELESS.</li>
+                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonCyan mt-1"></i> Eliminated 100% human effort (emailing, bug creation) via Gmail, Bug, Docs APIs.</li>
+                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonCyan mt-1"></i> Implemented RAG pipeline (Goose Model) grounding LLM outputs in SRE principles to control hallucination.</li>
+                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonCyan mt-1"></i> Resolved permission issues with auto-auth logic; deployed to borg.</li>
+                        </ul>
                     </div>
                 </div>
 
-                <!-- Project 2: offtofly -->
-                <div class="gsap-reveal relative grid md:grid-cols-12 items-center group">
-                    <div class="md:col-span-8 relative z-10 glass-panel p-6 md:p-8 rounded md:bg-transparent md:backdrop-filter-none md:p-0 md:text-right md:row-start-1 md:col-start-5">
-                        <p class="font-mono text-accent text-sm mb-2">Aug 2025</p>
-                        <h3 class="text-textPrimary text-2xl font-bold mb-6 hover:text-accent transition-colors">offtofly</h3>
-                        <div class="md:glass-panel md:p-6 md:rounded shadow-xl text-textSecondary mb-6 md:hover:bg-surfaceLight transition-colors text-left md:text-right">
-                            <ul class="space-y-3 list-none pl-0">
-                                <li>Engineered a scalable, distributed system architecture and defined the inter-service communication protocols for offtofly.</li>
-                                <li class="mt-2">Optimized system performance and concurrency by utilizing Go Goroutines to build Asynchronous Worker Pools, enabling 24/7 background scanning of high-latency APIs to reduce user-facing latency.</li>
-                                <li class="mt-2">Designed the relational data schema in PostgreSQL, enforcing data integrity; utilized the Prisma ORM for secure access across all backend services.</li>
-                            </ul>
-                        </div>
-                        <ul class="flex flex-wrap md:justify-end gap-4 font-mono text-sm text-textSecondary mb-6">
-                            <li>Go</li>
-                            <li>Python</li>
-                            <li>C++</li>
-                            <li>PostgreSQL</li>
-                            <li>Prisma ORM</li>
-                        </ul>
-                        <div class="flex md:justify-end gap-4">
-                            <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-accent"><i class="fab fa-github text-xl"></i></a>
-                        </div>
+                <!-- Ex- 2: Dish Media -->
+                <div class="flex justify-between items-center w-full flex-col md:flex-row-reverse gs-reveal">
+                    <div class="order-1 md:w-5/12 text-left hidden md:block">
+                        <h3 class="text-2xl font-bold glitch-hover">Dish Media Network</h3>
+                        <p class="font-mono text-neonPurple">Network Technician Intern</p>
+                        <p class="text-sm text-gray-400 mt-1">Dec 2023 – Mar 2024 | Kathmandu, Nepal</p>
                     </div>
-                    <div class="hidden md:block col-span-6 row-start-1 col-start-1 relative opacity-50 group-hover:opacity-100 transition-opacity duration-500 rounded overflow-hidden shadow-2xl">
-                        <div class="w-full h-[350px] bg-surfaceLight flex items-center justify-center border border-accent/20">
-                            <i class="fas fa-plane text-6xl text-accent/50 group-hover:text-accent transition-colors"></i>
+                    <div class="z-20 flex items-center order-1 bg-bgDark shadow-[0_0_15px_#b000ff] w-6 h-6 rounded-full border-4 border-neonPurple mb-4 md:mb-0"></div>
+                    <div class="order-1 glass-card p-6 md:w-5/12 rounded-xl relative group data-tilt self-start w-full md:self-auto">
+                        <div class="md:hidden mb-4 border-b border-white/10 pb-4">
+                            <h3 class="text-2xl font-bold text-white">Dish Media Network</h3>
+                            <p class="font-mono text-neonPurple">Network Technician Intern</p>
+                            <p class="text-xs text-gray-400">Dec 2023 – Mar 2024</p>
                         </div>
+                        <ul class="text-gray-300 text-sm space-y-3 leading-relaxed">
+                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonPurple mt-1"></i> Configured 10+ commercial routers and installed 2 residential distribution boxes.</li>
+                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonPurple mt-1"></i> Maintained cable infrastructure; managed field wiring, switch installations, and CCTVs.</li>
+                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonPurple mt-1"></i> Managed daily network diagnostics, troubleshooting, and documentation.</li>
+                        </ul>
                     </div>
                 </div>
+
             </div>
         </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="py-32 max-w-2xl mx-auto text-center">
-            <p class="gsap-reveal font-mono text-accent mb-4">04. What's Next?</p>
-            <h2 class="gsap-reveal text-4xl md:text-5xl font-bold text-textPrimary mb-6">Get In Touch</h2>
-            <p class="gsap-reveal text-lg mb-12">
-                I'm active on LinkedIn and always open to discussing backend engineering, distributed systems, or new opportunities. Whether you have a question or just want to say hi, my inbox is open!
+        <!-- Dynamic Projects Gallery -->
+        <section id="projects" class="py-24 relative z-10 w-full">
+            <div class="flex items-center gap-4 mb-16 gs-reveal">
+                <h2 class="text-4xl font-bold font-mono uppercase tracking-widest"><span class="text-neonCyan">03.</span> Core_Modules</h2>
+                <div class="h-[1px] flex-grow bg-gradient-to-r from-neonCyan to-transparent"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 gs-reveal-stagger">
+                
+                <!-- P1: eShopping -->
+                <div class="glass-card flex flex-col p-8 rounded-2xl border-t border-t-neonCyan/30 hover:-translate-y-2 transition-transform duration-500">
+                    <div class="flex justify-between items-start mb-6">
+                        <i class="fas fa-robot text-4xl text-neonCyan"></i>
+                        <div class="flex gap-3 text-2xl">
+                            <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-neonCyan transition-colors"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">eShopping for Intelligent Systems</h3>
+                    <p class="font-mono text-xs text-neonCyan mb-4">Jan 2026</p>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-6 flex-grow">
+                        Built scalable backend microservices in Go using gRPC. Engineered a real-time ZeroMQ pub-sub task dispatch system for instant communication between inventory service and warehouse robots. Coded REST API Gateway for client-facing endpoints.
+                    </p>
+                    <div class="flex flex-wrap gap-2 font-mono text-xs text-neonCyan/80 mt-auto">
+                        <span class="bg-neonCyan/10 px-2 py-1 rounded">Go</span>
+                        <span class="bg-neonCyan/10 px-2 py-1 rounded">gRPC</span>
+                        <span class="bg-neonCyan/10 px-2 py-1 rounded">ZeroMQ</span>
+                    </div>
+                </div>
+
+                <!-- P2: offtofly -->
+                <div class="glass-card flex flex-col p-8 rounded-2xl border-t border-t-neonPurple/30 hover:-translate-y-2 transition-transform duration-500">
+                    <div class="flex justify-between items-start mb-6">
+                        <i class="fas fa-plane-departure text-4xl text-neonPurple"></i>
+                        <div class="flex gap-3 text-2xl">
+                            <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-neonPurple transition-colors"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">offtofly</h3>
+                    <p class="font-mono text-xs text-neonPurple mb-4">Aug 2025</p>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-6 flex-grow">
+                        Engineered distributed architecture (Go/Python/C++) defining REST/gRPC protocols. Utilized Goroutines for Async Worker Pools to background scan high-latency APIs cleanly. Designed PostgreSQL schema using Prisma ORM.
+                    </p>
+                    <div class="flex flex-wrap gap-2 font-mono text-xs text-neonPurple/80 mt-auto">
+                        <span class="bg-neonPurple/10 px-2 py-1 rounded">Go/Python</span>
+                        <span class="bg-neonPurple/10 px-2 py-1 rounded">PostgreSQL</span>
+                        <span class="bg-neonPurple/10 px-2 py-1 rounded">Prisma</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer Contact Interface -->
+        <section class="py-32 text-center relative z-10">
+            <h2 class="text-5xl font-black font-mono tracking-tighter mb-6 cyber-gradient gs-reveal">Initiate.Handshake()</h2>
+            <p class="text-textMuted max-w-xl mx-auto mb-10 gs-reveal">
+                My protocol handles are always listening. Reaching out about backend engineering, 
+                high-performance systems, or new ventures.
             </p>
-            <div class="gsap-reveal font-mono mb-8 text-textSecondary text-sm">
-                <p>1000 17th Avenue North, Nashville, TN 37208</p>
-                <p>(615)-668-2773</p>
-            </div>
-            <div class="gsap-reveal">
-                <a href="mailto:jhadhiraj147@gmail.com" class="inline-block px-8 py-4 border border-accent text-accent rounded font-mono hover:bg-accent/10 transition-colors">
-                    Say Hello
+            <div class="gs-reveal mb-12">
+                <a href="mailto:jhadhiraj147@gmail.com" class="magnetic-btn glass-card px-10 py-5 text-xl font-bold border-2 border-neonCyan hover:bg-neonCyan text-white group transition-all duration-300 shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)]">
+                    <span class="magnetic-inner flex items-center gap-3">
+                        <i class="fas fa-envelope group-hover:animate-bounce"></i> Send Payload
+                    </span>
                 </a>
             </div>
+            
+            <p class="font-mono text-sm text-gray-500 gs-reveal">
+                Built by Dhiraj Jha // Next-Gen Interactive Template
+                <br>
+                1000 17th Avenue North, Nashville, TN 37208 • (615)-668-2773
+            </p>
         </section>
 
-        <!-- Footer -->
-        <footer class="py-6 text-center font-mono text-sm mt-12 mb-6">
-            <a href="https://github.com/jhadhiraj147/resume" target="_blank" class="hover:text-accent transition-colors inline-flex flex-col items-center gap-2">
-                <div>Designed & Built for Dhiraj Jha</div>
-                <div class="flex items-center gap-4 mt-2 opacity-70">
-                    <span class="hover:text-accent"><i class="fas fa-code-branch mr-1 text-accent"></i> github.com/jhadhiraj147</span>
-                </div>
-            </a>
-        </footer>
     </main>
 
+    <!-- Essential Scripts -->
     <script>
-        // Custom Cursor Logic
-        const dot = document.querySelector('.cursor-dot');
-        const outline = document.querySelector('.cursor-outline');
-
+        // Magnetic Cursor Logic
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let ringX = mouseX, ringY = mouseY;
+        
         window.addEventListener('mousemove', (e) => {
-            const posX = e.clientX;
-            const posY = e.clientY;
-            
-            dot.style.left = `${posX}px`;
-            dot.style.top = `${posY}px`;
-            
-            outline.animate({
-                left: `${posX}px`,
-                top: `${posY}px`
-            }, { duration: 500, fill: "forwards" });
+            mouseX = e.clientX; mouseY = e.clientY;
+            cursorDot.style.left = `${mouseX}px`;
+            cursorDot.style.top = `${mouseY}px`;
+        });
+        
+        // Smooth lerp for ring
+        const loop = () => {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+            cursorRing.style.left = `${ringX}px`;
+            cursorRing.style.top = `${ringY}px`;
+            requestAnimationFrame(loop);
+        };
+        loop();
+
+        // Magnetic Buttons Effect
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                // Move button slightly towards mouse
+                gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: 'power2.out' });
+                // Expand cursor
+                cursorRing.style.width = '60px'; cursorRing.style.height = '60px';
+                cursorRing.style.backgroundColor = 'rgba(0, 243, 255, 0.1)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.3)' });
+                cursorRing.style.width = '40px'; cursorRing.style.height = '40px';
+                cursorRing.style.backgroundColor = 'transparent';
+            });
         });
 
-        document.querySelectorAll('a, button').forEach(el => {
+        // Hover effect for links
+        document.querySelectorAll('a:not(.magnetic-btn)').forEach(el => {
             el.addEventListener('mouseenter', () => {
-                outline.style.width = '60px';
-                outline.style.height = '60px';
-                outline.style.backgroundColor = 'rgba(100, 255, 218, 0.1)';
+                cursorRing.style.width = '50px'; cursorRing.style.height = '50px';
+                cursorRing.style.borderColor = '#b000ff';
             });
             el.addEventListener('mouseleave', () => {
-                outline.style.width = '40px';
-                outline.style.height = '40px';
-                outline.style.backgroundColor = 'transparent';
+                cursorRing.style.width = '40px'; cursorRing.style.height = '40px';
+                cursorRing.style.borderColor = '#00f3ff';
             });
         });
 
-        document.addEventListener('mouseleave', () => {
-            dot.style.opacity = '0';
-            outline.style.opacity = '0';
-        });
-        document.addEventListener('mouseenter', () => {
-            dot.style.opacity = '1';
-            outline.style.opacity = '1';
-        });
-
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 0) {
-                navbar.classList.add('shadow-lg');
+        // Typewriter Effect
+        const words = ['Distributed Systems.', 'Microservices.', 'Fast Architectures.', 'The Future.'];
+        let wIdx = 0, charIdx = 0, isDeleting = false;
+        const typeEl = document.getElementById('typewriter');
+        
+        function typeWriter() {
+            const current = words[wIdx];
+            if (isDeleting) {
+                typeEl.innerText = current.substring(0, charIdx - 1);
+                charIdx--;
             } else {
-                navbar.classList.remove('shadow-lg');
+                typeEl.innerText = current.substring(0, charIdx + 1);
+                charIdx++;
             }
+            
+            let speed = isDeleting ? 50 : 100;
+            if (!isDeleting && charIdx === current.length) {
+                speed = 2000; isDeleting = true;
+            } else if (isDeleting && charIdx === 0) {
+                isDeleting = false; wIdx = (wIdx + 1) % words.length; speed = 500;
+            }
+            setTimeout(typeWriter, speed);
+        }
+        setTimeout(typeWriter, 1000);
+
+        // Canvas Cyber Node Network Background
+        const canvas = document.getElementById('network-bg');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        let particles = [];
+        
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         });
 
-        document.addEventListener("DOMContentLoaded", (event) => {
-            gsap.registerPlugin(ScrollTrigger);
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > width) this.vx *= -1;
+                if(this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 243, 255, 0.5)';
+                ctx.fill();
+            }
+        }
+        
+        // Responsive particle count
+        const P_COUNT = window.innerWidth < 768 ? 40 : 100;
+        for(let i=0; i<P_COUNT; i++) particles.push(new Particle());
 
-            const introTimeline = gsap.timeline();
-            gsap.set('.intro-elem', { autoAlpha: 1 });
+        function animateNodes() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
             
-            introTimeline.from('.intro-elem', {
-                y: 20,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.1,
-                ease: 'power3.out',
-                delay: 0.2
-            });
-
-            gsap.set('.gsap-reveal', { autoAlpha: 1 });
-            
-            gsap.utils.toArray('.gsap-reveal').forEach((elem) => {
-                if (!elem.classList.contains('intro-elem')) {
-                    gsap.from(elem, {
-                        scrollTrigger: {
-                            trigger: elem,
-                            start: 'top 85%',
-                            toggleActions: 'play none none reverse'
-                        },
-                        y: 30,
-                        opacity: 0,
-                        duration: 0.8,
-                        ease: 'power3.out'
-                    });
+            // Connect nodes & interact with mouse
+            for(let i=0; i<particles.length; i++) {
+                for(let j=i; j<particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if(dist < 120) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${0.2 - dist/120})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
                 }
-            });
+                
+                // Repel from mouse
+                const mdx = particles[i].x - mouseX;
+                const mdy = particles[i].y - mouseY;
+                const mdist = Math.sqrt(mdx*mdx + mdy*mdy);
+                if(mdist < 150) {
+                    particles[i].x += mdx * 0.01;
+                    particles[i].y += mdy * 0.01;
+                    
+                    // Draw laser to mouse
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(176, 0, 255, ${0.3 - mdist/150})`;
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(mouseX, mouseY);
+                    ctx.stroke();
+                }
+            }
+            requestAnimationFrame(animateNodes);
+        }
+        animateNodes();
+
+        // GSAP Scroll Animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        gsap.set('.gs-reveal', { y: 40, opacity: 0 });
+        ScrollTrigger.batch('.gs-reveal', {
+            onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, stagger: 0.15, duration: 1, ease: 'power3.out' }),
+            once: true
+        });
+
+        gsap.set('.gs-reveal-stagger > div', { y: 50, opacity: 0 });
+        ScrollTrigger.batch('.gs-reveal-stagger > div', {
+            onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: 'back.out(1.2)' }),
+            once: true
+        });
+        
+        // CSS Animation for timeline pulse line
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes linePulse {
+                0% { transform: translateY(-100%); opacity: 0; }
+                50% { opacity: 1; }
+                100% { transform: translateY(${document.querySelector('.wrap-timeline')?.offsetHeight || 800}px); opacity: 0; }
+            }
+            .pulse-line { animation: linePulse 3s infinite linear; }
+        `;
+        document.head.appendChild(style);
+
+        // Vanilla Tilt initialization for 3D elements
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+            max: 10, speed: 400, perspective: 1000, scale: 1.02
         });
     </script>
 </body>
