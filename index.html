@@ -14,18 +14,15 @@
             theme: {
                 extend: {
                     colors: {
-                        bgDark: '#050510',
+                        bgDark: '#03030a',
                         neonCyan: '#00f3ff',
                         neonPurple: '#b000ff',
-                        glassBg: 'rgba(20, 20, 35, 0.4)',
+                        glassBg: 'rgba(15, 15, 25, 0.6)',
                         textMuted: '#8b8baf'
                     },
                     fontFamily: {
-                        mono: ['Fira Code', 'monospace'],
+                        mono: ['Fira Code', 'Courier New', 'monospace'],
                         sans: ['Inter', 'sans-serif']
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
@@ -34,43 +31,37 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&family=Inter:wght@300;400;700;900&display=swap');
         
-        body {
-            background-color: #050510;
-            color: #ffffff;
-            overflow-x: hidden;
-            cursor: none; /* Custom cursor */
-        }
+        body { background-color: #03030a; color: #ffffff; overflow-x: hidden; cursor: none; }
 
-        /* 3D Network Canvas */
-        #network-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-            opacity: 0.7;
+        /* BOOT SEQUENCE OVERLAY */
+        #boot-screen {
+            position: fixed; inset: 0; background: #000; z-index: 99999;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 4rem; font-family: monospace; color: #00f3ff;
+            pointer-events: none; transition: opacity 1s, transform 1s cubic-bezier(0.85, 0, 0.15, 1);
         }
+        .boot-line { opacity: 0; text-shadow: 0 0 10px #00f3ff; font-size: 1.1rem; margin-bottom: 0.5rem; }
+        
+        /* Interactive Background Map */
+        #network-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.8; }
 
-        /* Glassmorphism Cards */
+        /* Glassmorphism */
         .glass-card {
-            background: rgba(20, 20, 35, 0.4);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 243, 255, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(15, 15, 25, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 243, 255, 0.15); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
         }
         .glass-card:hover {
-            border-color: rgba(0, 243, 255, 0.5);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(176, 0, 255, 0.2);
+            border-color: rgba(0, 243, 255, 0.6);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(176, 0, 255, 0.2);
+            transform: translateY(-5px);
         }
 
-        /* Cyber Glitch Text Effect */
+        /* Glitch Texts */
         .glitch-hover:hover {
             animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
-            color: #00f3ff;
-            text-shadow: 2px 2px #b000ff, -2px -2px #00f3ff;
+            color: #00f3ff; text-shadow: 2px 2px #b000ff, -2px -2px #00f3ff;
         }
-
         @keyframes glitch-skew {
             0% { transform: skew(0deg); }
             20% { transform: skew(-10deg); }
@@ -80,222 +71,201 @@
             100% { transform: skew(0deg); }
         }
 
-        /* Gradient Text */
-        .cyber-gradient {
-            background: linear-gradient(to right, #00f3ff, #b000ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .cyber-gradient { background: linear-gradient(to right, #00f3ff, #b000ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* Custom Magnetic Cursor */
-        #cursor-dot {
-            width: 8px; height: 8px; background: #00f3ff;
-            border-radius: 50%; opacity: 1; z-index: 10000;
-        }
-        #cursor-ring {
-            width: 40px; height: 40px;
-            border: 1px solid #00f3ff;
-            box-shadow: 0 0 10px #00f3ff;
-            border-radius: 50%; z-index: 9999;
-            transition: width 0.3s, height 0.3s, border-color 0.3s;
-        }
-        .cursor-part { position: fixed; pointer-events: none; transform: translate(-50%, -50%); }
+        /* Cursors */
+        #cursor-dot { width: 8px; height: 8px; background: #00f3ff; border-radius: 50%; z-index: 100000; box-shadow: 0 0 10px #00f3ff; }
+        #cursor-ring { width: 40px; height: 40px; border: 1px solid rgba(0, 243, 255, 0.8); border-radius: 50%; z-index: 99999; transition: width 0.2s, height 0.2s, background-color 0.2s; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); }
+        .cursor-part { position: fixed; pointer-events: none; transform: translate(-50%, -50%); mix-blend-mode: exclusion; }
 
-        /* Fancy Typewriter Cursor */
-        .type-cursor::after {
-            content: '|';
-            animation: blink 1s step-end infinite;
-            color: #00f3ff;
-        }
+        .type-cursor::after { content: '█'; animation: blink 1s step-end infinite; color: #00f3ff; text-shadow: 0 0 10px #00f3ff; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* Floating Animation */
-        .float-obj { animation: float 6s ease-in-out infinite; }
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(2deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
+        /* Hexagon Clip for Avatar */
+        .hex-clip { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
 
-        /* Magnetic Button */
-        .magnetic-btn { display: inline-block; position: relative; }
+        .magnetic-btn { display: inline-block; position: relative; cursor: none; }
         .magnetic-inner { pointer-events: none; }
+        
+        /* Terminal */
+        #interactive-terminal { font-family: monospace; border-top: 1px solid #00f3ff; }
     </style>
 </head>
 <body class="antialiased selection:bg-neonCyan selection:text-bgDark">
 
-    <!-- Background Interactive Network -->
+    <!-- BOOT SEQUENCE (Easter Egg Start) -->
+    <div id="boot-screen">
+        <div id="boot-text-container" class="max-w-3xl"></div>
+    </div>
+
+    <!-- CANVAS BG -->
     <canvas id="network-bg"></canvas>
 
-    <!-- Custom Cursor -->
+    <!-- CURSOR -->
     <div id="cursor-dot" class="cursor-part"></div>
     <div id="cursor-ring" class="cursor-part"></div>
 
-    <!-- Floating Navigation -->
-    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 glass-card px-8 py-3 rounded-full flex gap-8 font-mono text-sm tracking-wide shadow-[0_0_20px_rgba(0,243,255,0.15)]">
-        <a href="#about" class="hover:text-neonCyan transition-all hover:scale-110">System_Specs</a>
-        <a href="#experience" class="hover:text-neonCyan transition-all hover:scale-110">Telemetry</a>
-        <a href="#projects" class="hover:text-neonCyan transition-all hover:scale-110">Modules</a>
-        <a href="/Users/jhadhiraj147/Downloads/JobApply/jha_dhiraj_resume_13April2026.pdf" target="_blank" class="text-neonPurple hover:text-neonCyan transition-colors"><i class="fas fa-download"></i> Extract.pdf</a>
+    <!-- NAV -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 glass-card px-8 py-3 rounded-full flex items-center gap-8 font-mono text-sm tracking-wide gs-fade">
+        <a href="#about" class="hover:text-neonCyan transition-all hover:scale-110">SYS_SPECS</a>
+        <a href="#experience" class="hover:text-neonCyan transition-all hover:scale-110">TELEMETRY</a>
+        <a href="#projects" class="hover:text-neonCyan transition-all hover:scale-110">MODULES</a>
+        
+        <!-- FIXED PDF LINK HERE -->
+        <a href="./Dhiraj_Jha_Resume.pdf" target="_blank" download class="text-neonPurple hover:text-neonCyan transition-all flex items-center gap-2 border border-neonPurple/50 px-4 py-1.5 rounded-full hover:bg-neonPurple/10 hover:shadow-[0_0_15px_rgba(176,0,255,0.4)]">
+            <i class="fas fa-file-download animate-bounce"></i> EXTRACT.PDF
+        </a>
     </nav>
 
-    <!-- Social Sidebar -->
-    <div class="fixed right-6 bottom-12 z-40 hidden lg:flex flex-col gap-6 text-xl">
-        <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-neonCyan transition-all transform hover:-translate-x-2"><i class="fab fa-github"></i></a>
-        <a href="https://linkedin.com/in/jhadhiraj147" target="_blank" class="hover:text-neonCyan transition-all transform hover:-translate-x-2"><i class="fab fa-linkedin"></i></a>
-        <div class="w-[1px] h-20 bg-gradient-to-b from-neonCyan to-transparent mx-auto"></div>
+    <!-- SOCIAL SIDEBAR -->
+    <div class="fixed right-6 bottom-12 z-40 hidden lg:flex flex-col gap-6 text-2xl gs-fade">
+        <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-neonCyan hover:-translate-x-2 transition-all hover:shadow-[0_0_20px_#00f3ff] rounded-full"><i class="fab fa-github"></i></a>
+        <a href="https://linkedin.com/in/jhadhiraj147" target="_blank" class="hover:text-neonCyan hover:-translate-x-2 transition-all hover:shadow-[0_0_20px_#00f3ff] rounded-full"><i class="fab fa-linkedin mb-2"></i></a>
+        <div class="w-[2px] h-24 bg-gradient-to-b from-neonCyan to-transparent mx-auto"></div>
     </div>
 
-    <!-- Main Container -->
     <main class="w-full max-w-7xl mx-auto px-6 md:px-16 pt-32 pb-20 relative z-10">
         
-        <!-- Hero Section -->
+        <!-- HERO -->
         <section class="min-h-[85vh] flex flex-col justify-center relative">
-            <div class="absolute right-0 top-1/4 opacity-20 hidden md:block float-obj">
-                <i class="fas fa-network-wired text-[20rem] text-neonCyan"></i>
-            </div>
-
-            <p class="font-mono text-neonCyan mb-4 text-lg gs-reveal">> INIT ROOT_ACCESS: Dhiraj.Jha</p>
+            <p class="font-mono text-neonCyan mb-4 text-xl gs-hero">> ROOT_ACCESS GRANTED. WELCOME: <span class="text-white">DHIRAJ.JHA</span></p>
             
-            <h1 class="text-6xl md:text-8xl font-black mb-2 tracking-tight uppercase glitch-hover gs-reveal">
+            <h1 class="text-7xl md:text-9xl font-black mb-4 tracking-tighter uppercase glitch-hover gs-hero leading-none">
                 Dhiraj Jha
             </h1>
             
-            <h2 class="text-3xl md:text-5xl font-bold text-textMuted mb-8 gs-reveal">
-                Architecting <span class="cyber-gradient type-cursor" id="typewriter"></span>
+            <h2 class="text-3xl md:text-5xl font-bold text-textMuted mb-8 gs-hero flex flex-wrap gap-3 items-center">
+                <span>Architecting</span> <span class="cyber-gradient type-cursor font-black tracking-tight" id="typewriter"></span>
             </h2>
             
-            <p class="max-w-2xl text-lg text-textMuted leading-relaxed mb-10 gs-reveal">
+            <p class="max-w-2xl text-lg md:text-xl text-textMuted leading-relaxed mb-12 gs-hero border-l-2 border-neonCyan pl-6 py-2 bg-gradient-to-r from-neonCyan/10 to-transparent">
                 Presidential Scholar at Fisk University. Former Google Intern. 
-                Specializing in Go, C++, Distributed Systems, and highly scalable microservices.
-                Rank 7 Nationwide (Finalist) in the Nepal Olympiad in Informatics.
+                Specializing in Go, C++, Distributed Systems, and ultra-scalable backend event-driven architectures.
             </p>
             
-            <div class="flex gap-6 gs-reveal font-mono">
-                <a href="#experience" class="magnetic-btn glass-card px-8 py-4 rounded hover:bg-neonCyan/10 border border-neonCyan text-neonCyan group transition-all">
-                    <span class="magnetic-inner flex items-center gap-2">
-                        Execute_Workflow() <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+            <div class="flex gap-6 gs-hero font-mono">
+                <a href="#experience" class="magnetic-btn glass-card px-8 py-5 rounded shadow-[0_0_20px_rgba(0,243,255,0.2)] hover:shadow-[0_0_40px_rgba(0,243,255,0.6)] border border-neonCyan text-neonCyan group transition-all text-lg font-bold">
+                    <span class="magnetic-inner flex items-center gap-3">
+                        <i class="fas fa-terminal"></i> Execute_Workflow() <i class="fas fa-arrow-right group-hover:translate-x-3 transition-transform"></i>
                     </span>
                 </a>
             </div>
         </section>
 
-        <!-- Stats / Tech Stack Grid (Tilt Cards) -->
+        <!-- SPECS -->
         <section id="about" class="py-24 relative z-10">
-            <div class="flex items-center gap-4 mb-16 gs-reveal">
-                <h2 class="text-4xl font-bold font-mono uppercase tracking-widest"><span class="text-neonPurple">01.</span> System_Specs</h2>
-                <div class="h-[1px] flex-grow bg-gradient-to-r from-neonPurple to-transparent"></div>
+            <div class="flex items-center gap-6 mb-16 gs-reveal">
+                <h2 class="text-4xl md:text-5xl font-bold font-mono uppercase tracking-widest text-white drop-shadow-[0_0_10px_#b000ff]"><span class="text-neonPurple">01.</span> SYS_SPECS</h2>
+                <div class="h-[2px] flex-grow bg-gradient-to-r from-neonPurple to-transparent shadow-[0_0_10px_#b000ff]"></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-mono text-sm gs-reveal-stagger">
-                
-                <!-- Card 1: Core Languages -->
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
-                    <div class="absolute -right-4 -top-4 text-6xl text-white/5 group-hover:scale-150 transition-transform duration-500"><i class="fas fa-code"></i></div>
-                    <h3 class="text-neonCyan text-xl font-bold mb-4 border-b border-neonCyan/30 pb-2">Languages</h3>
-                    <ul class="space-y-3 z-10 relative text-gray-300">
-                        <li class="flex justify-between items-center"><span>Go</span> <span class="text-neonCyan">PRIMARY*</span></li>
-                        <li class="flex justify-between items-center"><span>C / C++</span> <span class="bg-white/10 px-2 rounded">Expert</span></li>
-                        <li class="flex justify-between items-center"><span>Python</span> <span class="bg-white/10 px-2 rounded">Advanced</span></li>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 font-mono text-sm gs-reveal-stagger">
+                <!-- Data Core: Languages -->
+                <div class="glass-card p-8 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="20" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.4">
+                    <div class="absolute -right-6 -top-6 text-8xl text-neonCyan/10 group-hover:scale-125 transition-transform duration-500 group-hover:text-neonCyan/20"><i class="fas fa-code"></i></div>
+                    <h3 class="text-neonCyan text-2xl font-bold mb-6 border-b border-neonCyan/30 pb-2 drop-shadow-[0_0_5px_#00f3ff]">Lexicon</h3>
+                    <ul class="space-y-4 z-10 relative text-gray-200 text-base">
+                        <li class="flex justify-between items-center group/item cursor-default"><span class="group-hover/item:text-neonCyan transition">Go</span> <span class="bg-neonCyan text-bgDark px-2 py-0.5 rounded font-bold animate-pulse-slow">PRIMARY*</span></li>
+                        <li class="flex justify-between items-center group/item cursor-default"><span class="group-hover/item:text-neonCyan transition">C / C++</span> <span class="border border-white/20 px-2 rounded">Expert</span></li>
+                        <li class="flex justify-between items-center group/item cursor-default"><span class="group-hover/item:text-neonCyan transition">Python</span> <span class="border border-white/20 px-2 rounded">Advanced</span></li>
                     </ul>
                 </div>
 
-                <!-- Card 2: Systems -->
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
-                    <div class="absolute -right-4 -top-4 text-6xl text-white/5 group-hover:scale-150 transition-transform duration-500"><i class="fas fa-project-diagram"></i></div>
-                    <h3 class="text-neonPurple text-xl font-bold mb-4 border-b border-neonPurple/30 pb-2">Systems</h3>
-                    <div class="flex flex-wrap gap-2 z-10 relative">
-                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">REST / RPC</span>
-                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">GraphQL / WS</span>
-                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">Kafka / Flink</span>
-                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">RabbitMQ</span>
-                        <span class="px-2 py-1 bg-neonPurple/20 border border-neonPurple/50 rounded text-xs">ZeroMQ</span>
+                <!-- Data Core: Protocols -->
+                <div class="glass-card p-8 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="20" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.4">
+                    <div class="absolute -right-6 -top-6 text-8xl text-neonPurple/10 group-hover:scale-125 transition-transform duration-500 group-hover:text-neonPurple/20"><i class="fas fa-project-diagram"></i></div>
+                    <h3 class="text-neonPurple text-2xl font-bold mb-6 border-b border-neonPurple/30 pb-2 drop-shadow-[0_0_5px_#b000ff]">Topology</h3>
+                    <div class="flex flex-wrap gap-3 z-10 relative text-sm">
+                        <span class="px-3 py-1.5 bg-bgDark border border-neonPurple hover:bg-neonPurple hover:text-white transition cursor-default">REST / RPC</span>
+                        <span class="px-3 py-1.5 bg-bgDark border border-neonPurple hover:bg-neonPurple hover:text-white transition cursor-default">GraphQL</span>
+                        <span class="px-3 py-1.5 bg-bgDark border border-neonPurple hover:bg-neonPurple hover:text-white transition cursor-default">Kafka / Flink</span>
+                        <span class="px-3 py-1.5 bg-bgDark border border-neonPurple hover:bg-neonPurple hover:text-white transition cursor-default">RabbitMQ</span>
+                        <span class="px-3 py-1.5 bg-bgDark border border-neonPurple hover:bg-neonPurple hover:text-white transition cursor-default animate-pulse-slow">ZeroMQ</span>
                     </div>
                 </div>
 
-                <!-- Card 3: DBs -->
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
-                    <div class="absolute -right-4 -top-4 text-6xl text-white/5 group-hover:scale-150 transition-transform duration-500"><i class="fas fa-database"></i></div>
-                    <h3 class="text-neonCyan text-xl font-bold mb-4 border-b border-neonCyan/30 pb-2">Storage</h3>
-                    <ul class="space-y-3 z-10 relative text-gray-300">
-                        <li>PostgreSQL</li>
-                        <li>MongoDB</li>
-                        <li>DynamoDB</li>
-                        <li>Redis / Prisma</li>
+                <!-- Data Core: Storage -->
+                <div class="glass-card p-8 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="20" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.4">
+                    <div class="absolute -right-6 -top-6 text-8xl text-neonCyan/10 group-hover:scale-125 transition-transform duration-500 group-hover:text-neonCyan/20"><i class="fas fa-database"></i></div>
+                    <h3 class="text-neonCyan text-2xl font-bold mb-6 border-b border-neonCyan/30 pb-2 drop-shadow-[0_0_5px_#00f3ff]">Storage</h3>
+                    <ul class="space-y-3 z-10 relative text-gray-200 text-base">
+                        <li class="hover:translate-x-2 transition-transform hover:text-neonCyan"><i class="fas fa-server mr-2 text-neonCyan/50"></i>PostgreSQL</li>
+                        <li class="hover:translate-x-2 transition-transform hover:text-neonCyan"><i class="fas fa-server mr-2 text-neonCyan/50"></i>MongoDB</li>
+                        <li class="hover:translate-x-2 transition-transform hover:text-neonCyan"><i class="fas fa-server mr-2 text-neonCyan/50"></i>DynamoDB</li>
+                        <li class="hover:translate-x-2 transition-transform hover:text-neonCyan"><i class="fas fa-server mr-2 text-neonCyan/50"></i>Redis / Prisma</li>
                     </ul>
                 </div>
 
-                <!-- Card 4: Infra -->
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
-                    <div class="absolute -right-4 -top-4 text-6xl text-white/5 group-hover:scale-150 transition-transform duration-500"><i class="fas fa-cloud"></i></div>
-                    <h3 class="text-neonPurple text-xl font-bold mb-4 border-b border-neonPurple/30 pb-2">Cloud & Infra</h3>
-                    <ul class="space-y-3 z-10 relative text-gray-300">
-                        <li>Docker / K8s</li>
-                        <li>AWS / GCP</li>
-                        <li>Linux Admin</li>
-                        <li>CI/CD Pipelines</li>
+                <!-- Data Core: Infra -->
+                <div class="glass-card p-8 rounded-xl relative overflow-hidden group" data-tilt data-tilt-max="20" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.4">
+                    <div class="absolute -right-6 -top-6 text-8xl text-neonPurple/10 group-hover:scale-125 transition-transform duration-500 group-hover:text-neonPurple/20"><i class="fas fa-cloud"></i></div>
+                    <h3 class="text-neonPurple text-2xl font-bold mb-6 border-b border-neonPurple/30 pb-2 drop-shadow-[0_0_5px_#b000ff]">Infrastructure</h3>
+                    <ul class="space-y-3 z-10 relative text-gray-200 text-base">
+                        <li class="hover:translate-x-2 transition-transform hover:text-neonPurple"><i class="fas fa-cubes mr-2 text-neonPurple/50"></i>Docker / K8s</li>
+                        <li class="hover:translate-x-2 transition-transform hover:text-neonPurple"><i class="fas fa-cloud-upload-alt mr-2 text-neonPurple/50"></i>AWS / GCP</li>
+                        <li class="hover:translate-x-2 transition-transform hover:text-neonPurple"><i class="fab fa-linux mr-2 text-neonPurple/50"></i>Linux Admin</li>
+                        <li class="hover:translate-x-2 transition-transform hover:text-neonPurple"><i class="fas fa-shipping-fast mr-2 text-neonPurple/50"></i>CI/CD GitOps</li>
                     </ul>
                 </div>
-
             </div>
         </section>
 
-        <!-- Experience Timeline (Cyber/Node Style) -->
-        <section id="experience" class="py-24 relative z-10">
-            <div class="flex items-center gap-4 mb-16 gs-reveal">
-                <div class="h-[1px] flex-grow bg-gradient-to-l from-neonCyan to-transparent"></div>
-                <h2 class="text-4xl font-bold font-mono uppercase tracking-widest"><span class="text-neonCyan">02.</span> Telemetry_Log</h2>
+        <!-- TIMELINE -->
+        <section id="experience" class="py-32 relative z-10">
+            <div class="flex items-center gap-6 mb-24 gs-reveal">
+                <div class="h-[2px] flex-grow bg-gradient-to-l from-neonCyan to-transparent shadow-[0_0_10px_#00f3ff]"></div>
+                <h2 class="text-4xl md:text-5xl font-bold font-mono uppercase tracking-widest text-white drop-shadow-[0_0_10px_#00f3ff]"><span class="text-neonCyan">02.</span> TELEMETRY_LOG</h2>
             </div>
 
             <div class="relative wrap-timeline">
-                <!-- Glowing central line -->
-                <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-[2px] bg-neonCyan/20 shadow-[0_0_10px_#00f3ff]">
-                    <!-- Pulsing signal running down the line -->
-                    <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-transparent via-neonCyan to-transparent opacity-50 pulse-line"></div>
+                <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-[3px] bg-neonCyan/20 shadow-[0_0_15px_#00f3ff]">
+                    <div class="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-transparent via-cyan-400 to-transparent opacity-80 pulse-line"></div>
                 </div>
 
-                <!-- Ex- 1: Google -->
-                <div class="mb-20 flex justify-between items-center w-full flex-col md:flex-row gs-reveal">
+                <!-- Google -->
+                <div class="mb-32 flex justify-between items-center w-full flex-col md:flex-row gs-reveal group">
                     <div class="order-1 md:w-5/12 text-right hidden md:block">
-                        <h3 class="text-2xl font-bold glitch-hover">Google</h3>
-                        <p class="font-mono text-neonCyan">Associate Software Developer Intern</p>
-                        <p class="text-sm text-gray-400 mt-1">May 2025 – Aug 2025 | Sunnyvale, CA</p>
+                        <h3 class="text-4xl font-extrabold glitch-hover text-white drop-shadow-[0_0_5px_#fff]">Google</h3>
+                        <p class="font-mono text-neonCyan text-xl mt-2 bg-neonCyan/10 inline-block px-4 py-1 rounded">Associate SWE Intern</p>
+                        <p class="text-base text-gray-400 mt-2 font-mono"><i class="fas fa-map-marker-alt"></i> Sunnyvale, CA | May 2025 – Aug 2025</p>
                     </div>
-                    <div class="z-20 flex items-center order-1 bg-bgDark shadow-[0_0_15px_#00f3ff] w-6 h-6 rounded-full border-4 border-neonCyan mb-4 md:mb-0"></div>
-                    <div class="order-1 glass-card p-6 md:w-5/12 rounded-xl relative group data-tilt self-start w-full md:self-auto">
-                        <div class="md:hidden mb-4 border-b border-white/10 pb-4">
-                            <h3 class="text-2xl font-bold text-white">Google</h3>
-                            <p class="font-mono text-neonCyan">Associate Software Developer Intern</p>
-                            <p class="text-xs text-gray-400">May 2025 – Aug 2025</p>
+                    <div class="z-20 flex items-center order-1 bg-bgDark shadow-[0_0_20px_#00f3ff] w-8 h-8 rounded-full border-[5px] border-neonCyan mb-6 md:mb-0 group-hover:scale-150 transition-transform duration-300 group-hover:bg-neonCyan"></div>
+                    <div class="order-1 glass-card p-8 md:w-5/12 rounded-xl relative group-hover:-translate-y-2 group-hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] transition-all duration-300 self-start w-full md:self-auto border-l-4 border-l-neonCyan">
+                        <div class="md:hidden mb-6 border-b border-white/10 pb-4">
+                            <h3 class="text-3xl font-bold text-white drop-shadow-[0_0_5px_#fff]">Google</h3>
+                            <p class="font-mono text-neonCyan text-lg mt-1">Associate SWE Intern</p>
+                            <p class="text-sm text-gray-400 mt-1 font-mono">May 2025 – Aug 2025</p>
                         </div>
-                        <p class="text-sm font-mono text-neonPurple mb-4">Project: PRICE (Production Risks in Core Eng.)</p>
-                        <ul class="text-gray-300 text-sm space-y-3 leading-relaxed">
-                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonCyan mt-1"></i> Reduced PRICE assessment time by 99% (3 days → 15 mins) by building automated tool PRICELESS.</li>
-                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonCyan mt-1"></i> Eliminated 100% human effort (emailing, bug creation) via Gmail, Bug, Docs APIs.</li>
-                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonCyan mt-1"></i> Implemented RAG pipeline (Goose Model) grounding LLM outputs in SRE principles to control hallucination.</li>
-                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonCyan mt-1"></i> Resolved permission issues with auto-auth logic; deployed to borg.</li>
+                        <div class="bg-black/50 p-3 rounded border border-neonPurple/30 mb-6 font-mono text-sm shadow-[inset_0_0_10px_rgba(176,0,255,0.1)]">
+                            <p class="text-neonPurple"><i class="fas fa-terminal"></i> <span class="opacity-70">Project:</span> PRICE (Production Risks in Core Eng.)</p>
+                        </div>
+                        <ul class="text-gray-300 text-base font-sans space-y-4 leading-relaxed">
+                            <li class="flex items-start gap-3"><i class="fas fa-bolt text-neonCyan mt-1.5 text-lg drop-shadow-[0_0_5px_#00f3ff]"></i> <span>Reduced PRICE assessment time by <strong>99%</strong> (3 days → 15 mins) by building automated tool PRICELESS.</span></li>
+                            <li class="flex items-start gap-3"><i class="fas fa-bolt text-neonCyan mt-1.5 text-lg drop-shadow-[0_0_5px_#00f3ff]"></i> <span>Eliminated 100% human effort via Gmail, Bug, and Docs APIs.</span></li>
+                            <li class="flex items-start gap-3"><i class="fas fa-bolt text-neonCyan mt-1.5 text-lg drop-shadow-[0_0_5px_#00f3ff]"></i> <span>Implemented RAG pipeline grounding LLM outputs (Goose Model) in SRE principles.</span></li>
+                            <li class="flex items-start gap-3"><i class="fas fa-bolt text-neonCyan mt-1.5 text-lg drop-shadow-[0_0_5px_#00f3ff]"></i> <span>Embedded auto-authentication logic and deployed to borg.</span></li>
                         </ul>
                     </div>
                 </div>
 
-                <!-- Ex- 2: Dish Media -->
-                <div class="flex justify-between items-center w-full flex-col md:flex-row-reverse gs-reveal">
+                <!-- Dish -->
+                <div class="flex justify-between items-center w-full flex-col md:flex-row-reverse gs-reveal group">
                     <div class="order-1 md:w-5/12 text-left hidden md:block">
-                        <h3 class="text-2xl font-bold glitch-hover">Dish Media Network</h3>
-                        <p class="font-mono text-neonPurple">Network Technician Intern</p>
-                        <p class="text-sm text-gray-400 mt-1">Dec 2023 – Mar 2024 | Kathmandu, Nepal</p>
+                        <h3 class="text-4xl font-extrabold glitch-hover text-white drop-shadow-[0_0_5px_#fff]">Dish Media Network</h3>
+                        <p class="font-mono text-neonPurple text-xl mt-2 bg-neonPurple/10 inline-block px-4 py-1 rounded">Network Technician Intern</p>
+                        <p class="text-base text-gray-400 mt-2 font-mono"><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal | Dec 2023 – Mar 2024</p>
                     </div>
-                    <div class="z-20 flex items-center order-1 bg-bgDark shadow-[0_0_15px_#b000ff] w-6 h-6 rounded-full border-4 border-neonPurple mb-4 md:mb-0"></div>
-                    <div class="order-1 glass-card p-6 md:w-5/12 rounded-xl relative group data-tilt self-start w-full md:self-auto">
-                        <div class="md:hidden mb-4 border-b border-white/10 pb-4">
-                            <h3 class="text-2xl font-bold text-white">Dish Media Network</h3>
-                            <p class="font-mono text-neonPurple">Network Technician Intern</p>
-                            <p class="text-xs text-gray-400">Dec 2023 – Mar 2024</p>
+                    <div class="z-20 flex items-center order-1 bg-bgDark shadow-[0_0_20px_#b000ff] w-8 h-8 rounded-full border-[5px] border-neonPurple mb-6 md:mb-0 group-hover:scale-150 transition-transform duration-300 group-hover:bg-neonPurple"></div>
+                    <div class="order-1 glass-card p-8 md:w-5/12 rounded-xl relative group-hover:-translate-y-2 group-hover:shadow-[0_0_30px_rgba(176,0,255,0.4)] transition-all duration-300 self-start w-full md:self-auto border-r-4 border-r-neonPurple">
+                        <div class="md:hidden mb-6 border-b border-white/10 pb-4">
+                            <h3 class="text-3xl font-bold text-white drop-shadow-[0_0_5px_#fff]">Dish Media Network</h3>
+                            <p class="font-mono text-neonPurple text-lg mt-1">Network Technician Intern</p>
+                            <p class="text-sm text-gray-400 mt-1 font-mono">Dec 2023 – Mar 2024</p>
                         </div>
-                        <ul class="text-gray-300 text-sm space-y-3 leading-relaxed">
-                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonPurple mt-1"></i> Configured 10+ commercial routers and installed 2 residential distribution boxes.</li>
-                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonPurple mt-1"></i> Maintained cable infrastructure; managed field wiring, switch installations, and CCTVs.</li>
-                            <li class="flex gap-2"><i class="fas fa-caret-right text-neonPurple mt-1"></i> Managed daily network diagnostics, troubleshooting, and documentation.</li>
+                        <ul class="text-gray-300 text-base font-sans space-y-4 leading-relaxed">
+                            <li class="flex items-start gap-3"><i class="fas fa-network-wired text-neonPurple mt-1.5 text-lg drop-shadow-[0_0_5px_#b000ff]"></i> <span>Configured 10+ commercial routers and installed 2 residential distribution boxes.</span></li>
+                            <li class="flex items-start gap-3"><i class="fas fa-network-wired text-neonPurple mt-1.5 text-lg drop-shadow-[0_0_5px_#b000ff]"></i> <span>Maintained cable infrastructure; managed field wiring, switches, and CCTVs.</span></li>
+                            <li class="flex items-start gap-3"><i class="fas fa-network-wired text-neonPurple mt-1.5 text-lg drop-shadow-[0_0_5px_#b000ff]"></i> <span>Managed daily network diagnostics, troubleshooting, and documentation.</span></li>
                         </ul>
                     </div>
                 </div>
@@ -303,85 +273,137 @@
             </div>
         </section>
 
-        <!-- Dynamic Projects Gallery -->
-        <section id="projects" class="py-24 relative z-10 w-full">
-            <div class="flex items-center gap-4 mb-16 gs-reveal">
-                <h2 class="text-4xl font-bold font-mono uppercase tracking-widest"><span class="text-neonCyan">03.</span> Core_Modules</h2>
-                <div class="h-[1px] flex-grow bg-gradient-to-r from-neonCyan to-transparent"></div>
+        <!-- PROJECTS -->
+        <section id="projects" class="py-32 relative z-10 w-full">
+            <div class="flex items-center gap-6 mb-20 gs-reveal">
+                <h2 class="text-4xl md:text-5xl font-bold font-mono uppercase tracking-widest text-white drop-shadow-[0_0_10px_#00f3ff]"><span class="text-neonCyan">03.</span> ARCHITECTURE_MODULES</h2>
+                <div class="h-[2px] flex-grow bg-gradient-to-r from-neonCyan to-transparent shadow-[0_0_10px_#00f3ff]"></div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8 gs-reveal-stagger">
+            <div class="grid md:grid-cols-2 gap-12 gs-reveal-stagger">
                 
-                <!-- P1: eShopping -->
-                <div class="glass-card flex flex-col p-8 rounded-2xl border-t border-t-neonCyan/30 hover:-translate-y-2 transition-transform duration-500">
-                    <div class="flex justify-between items-start mb-6">
-                        <i class="fas fa-robot text-4xl text-neonCyan"></i>
-                        <div class="flex gap-3 text-2xl">
-                            <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-neonCyan transition-colors"><i class="fab fa-github"></i></a>
+                <!-- P1 -->
+                <div class="glass-card flex flex-col p-10 rounded-2xl border-t-2 border-t-neonCyan hover:-translate-y-4 transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,243,255,0.3)] group cursor-none">
+                    <div class="flex justify-between items-start mb-8 border-b border-white/5 pb-6">
+                        <div class="bg-neonCyan/10 p-4 rounded-xl group-hover:bg-neonCyan transition-colors duration-300">
+                            <i class="fas fa-project-diagram text-5xl text-neonCyan group-hover:text-bgDark transition-colors"></i>
                         </div>
+                        <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-white text-neonCyan transition-all hover:scale-125 text-3xl"><i class="fab fa-github"></i></a>
                     </div>
-                    <h3 class="text-2xl font-bold mb-2">eShopping for Intelligent Systems</h3>
-                    <p class="font-mono text-xs text-neonCyan mb-4">Jan 2026</p>
-                    <p class="text-sm text-gray-300 leading-relaxed mb-6 flex-grow">
-                        Built scalable backend microservices in Go using gRPC. Engineered a real-time ZeroMQ pub-sub task dispatch system for instant communication between inventory service and warehouse robots. Coded REST API Gateway for client-facing endpoints.
+                    <p class="font-mono text-sm text-neonCyan mb-2 font-bold tracking-widest uppercase">Jan 2026 // Distributed API</p>
+                    <h3 class="text-3xl font-black mb-4 text-white drop-shadow-[0_0_5px_#fff]">eShopping Framework</h3>
+                    
+                    <p class="text-base text-gray-300 leading-relaxed mb-8 flex-grow font-sans">
+                        Built scalable backend microservices in <span class="text-neonCyan font-bold">Go</span> using <span class="text-white font-bold">gRPC</span>. Engineered a real-time <span class="text-neonPurple border-b border-neonPurple">ZeroMQ pub-sub</span> task dispatch system for instant, Uber-like communication between the inventory service and warehouse robots. Coded REST API Gateway for all client-facing endpoints.
                     </p>
-                    <div class="flex flex-wrap gap-2 font-mono text-xs text-neonCyan/80 mt-auto">
-                        <span class="bg-neonCyan/10 px-2 py-1 rounded">Go</span>
-                        <span class="bg-neonCyan/10 px-2 py-1 rounded">gRPC</span>
-                        <span class="bg-neonCyan/10 px-2 py-1 rounded">ZeroMQ</span>
+                    
+                    <div class="flex flex-wrap gap-3 font-mono text-sm mt-auto">
+                        <span class="bg-bgDark border border-neonCyan text-neonCyan px-3 py-1.5 rounded shadow-[0_0_10px_rgba(0,243,255,0.2)]">Go</span>
+                        <span class="bg-bgDark border border-neonCyan text-neonCyan px-3 py-1.5 rounded shadow-[0_0_10px_rgba(0,243,255,0.2)]">gRPC</span>
+                        <span class="bg-bgDark border border-neonCyan text-neonCyan px-3 py-1.5 rounded shadow-[0_0_10px_rgba(0,243,255,0.2)]">ZeroMQ</span>
+                        <span class="bg-bgDark border border-neonCyan text-neonCyan px-3 py-1.5 rounded shadow-[0_0_10px_rgba(0,243,255,0.2)]">REST API</span>
                     </div>
                 </div>
 
-                <!-- P2: offtofly -->
-                <div class="glass-card flex flex-col p-8 rounded-2xl border-t border-t-neonPurple/30 hover:-translate-y-2 transition-transform duration-500">
-                    <div class="flex justify-between items-start mb-6">
-                        <i class="fas fa-plane-departure text-4xl text-neonPurple"></i>
-                        <div class="flex gap-3 text-2xl">
-                            <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-neonPurple transition-colors"><i class="fab fa-github"></i></a>
+                <!-- P2 -->
+                <div class="glass-card flex flex-col p-10 rounded-2xl border-t-2 border-t-neonPurple hover:-translate-y-4 transition-all duration-500 hover:shadow-[0_20px_40px_rgba(176,0,255,0.3)] group cursor-none">
+                    <div class="flex justify-between items-start mb-8 border-b border-white/5 pb-6">
+                        <div class="bg-neonPurple/10 p-4 rounded-xl group-hover:bg-neonPurple transition-colors duration-300">
+                            <i class="fas fa-fighter-jet text-5xl text-neonPurple group-hover:text-bgDark transition-colors"></i>
                         </div>
+                        <a href="https://github.com/jhadhiraj147" target="_blank" class="hover:text-white text-neonPurple transition-all hover:scale-125 text-3xl"><i class="fab fa-github"></i></a>
                     </div>
-                    <h3 class="text-2xl font-bold mb-2">offtofly</h3>
-                    <p class="font-mono text-xs text-neonPurple mb-4">Aug 2025</p>
-                    <p class="text-sm text-gray-300 leading-relaxed mb-6 flex-grow">
-                        Engineered distributed architecture (Go/Python/C++) defining REST/gRPC protocols. Utilized Goroutines for Async Worker Pools to background scan high-latency APIs cleanly. Designed PostgreSQL schema using Prisma ORM.
+                    <p class="font-mono text-sm text-neonPurple mb-2 font-bold tracking-widest uppercase">Aug 2025 // Worker Pool</p>
+                    <h3 class="text-3xl font-black mb-4 text-white drop-shadow-[0_0_5px_#fff]">offtofly System</h3>
+                    
+                    <p class="text-base text-gray-300 leading-relaxed mb-8 flex-grow font-sans">
+                        Engineered distributed architecture (<span class="text-neonPurple font-bold">Go/Python/C++</span>) defining Inter-Service Protocols. Utilized <span class="text-white border-b">Go Goroutines for Async Worker Pools</span> to background scan high-latency APIs cleanly 24/7. Designed robust PostgreSQL schema governed by Prisma ORM.
                     </p>
-                    <div class="flex flex-wrap gap-2 font-mono text-xs text-neonPurple/80 mt-auto">
-                        <span class="bg-neonPurple/10 px-2 py-1 rounded">Go/Python</span>
-                        <span class="bg-neonPurple/10 px-2 py-1 rounded">PostgreSQL</span>
-                        <span class="bg-neonPurple/10 px-2 py-1 rounded">Prisma</span>
+                    
+                    <div class="flex flex-wrap gap-3 font-mono text-sm mt-auto">
+                        <span class="bg-bgDark border border-neonPurple text-neonPurple px-3 py-1.5 rounded shadow-[0_0_10px_rgba(176,0,255,0.2)]">Goroutines</span>
+                        <span class="bg-bgDark border border-neonPurple text-neonPurple px-3 py-1.5 rounded shadow-[0_0_10px_rgba(176,0,255,0.2)]">PostgreSQL</span>
+                        <span class="bg-bgDark border border-neonPurple text-neonPurple px-3 py-1.5 rounded shadow-[0_0_10px_rgba(176,0,255,0.2)]">Prisma ORM</span>
+                        <span class="bg-bgDark border border-neonPurple text-neonPurple px-3 py-1.5 rounded shadow-[0_0_10px_rgba(176,0,255,0.2)]">Python</span>
                     </div>
                 </div>
 
             </div>
         </section>
 
-        <!-- Footer Contact Interface -->
-        <section class="py-32 text-center relative z-10">
-            <h2 class="text-5xl font-black font-mono tracking-tighter mb-6 cyber-gradient gs-reveal">Initiate.Handshake()</h2>
-            <p class="text-textMuted max-w-xl mx-auto mb-10 gs-reveal">
-                My protocol handles are always listening. Reaching out about backend engineering, 
-                high-performance systems, or new ventures.
-            </p>
-            <div class="gs-reveal mb-12">
-                <a href="mailto:jhadhiraj147@gmail.com" class="magnetic-btn glass-card px-10 py-5 text-xl font-bold border-2 border-neonCyan hover:bg-neonCyan text-white group transition-all duration-300 shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)]">
-                    <span class="magnetic-inner flex items-center gap-3">
-                        <i class="fas fa-envelope group-hover:animate-bounce"></i> Send Payload
-                    </span>
-                </a>
+        <!-- INTERACTIVE TERMINAL & CONTACT -->
+        <section class="py-20 mt-10 relative z-10 glass-card rounded-2xl overflow-hidden gs-reveal border-neonCyan">
+            <!-- Mac style window header -->
+            <div class="bg-black/50 border-b border-neonCyan/30 p-3 flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                <div class="font-mono text-xs text-gray-400 ml-4">root@dhiraj-jha: /home/contact</div>
             </div>
             
-            <p class="font-mono text-sm text-gray-500 gs-reveal">
-                Built by Dhiraj Jha // Next-Gen Interactive Template
-                <br>
-                1000 17th Avenue North, Nashville, TN 37208 • (615)-668-2773
-            </p>
+            <div class="p-8 text-center" id="interactive-terminal">
+                <h2 class="text-5xl font-black font-mono tracking-tighter mb-4 cyber-gradient">Initiate.Handshake()</h2>
+                <p class="text-gray-300 max-w-xl mx-auto mb-10 text-lg font-sans">
+                    My protocol handles are always listening for robust engineering discussions or compelling new ventures.
+                </p>
+                <div class="mb-12 flex justify-center">
+                    <a href="mailto:jhadhiraj147@gmail.com" class="magnetic-btn bg-neonCyan text-bgDark px-12 py-5 text-xl font-black rounded hover:bg-white hover:text-black transition-colors duration-300 shadow-[0_0_20px_rgba(0,243,255,0.6)]">
+                        <span class="magnetic-inner flex items-center gap-3">
+                            <i class="fas fa-paper-plane hover:animate-ping"></i> TRANSMIT_PAYLOAD
+                        </span>
+                    </a>
+                </div>
+                
+                <p class="font-mono text-sm text-neonCyan mb-2">> PING 1000 17th Avenue North, Nashville, TN 37208</p>
+                <p class="font-mono text-sm text-neonPurple">> DIAL (615)-668-2773</p>
+            </div>
         </section>
 
     </main>
 
-    <!-- Essential Scripts -->
+    <!-- SCRIPTS -->
     <script>
-        // Magnetic Cursor Logic
+        // BOOT SEQUENCE EASTER EGG
+        const bootLines = [
+            "INITIATING KERNEL SEQUENCE...",
+            "[OK] CPU CORE: ALLOCATED",
+            "[OK] MEMORY ALLOCATION: 128TB VRAM",
+            "MOUNTING ENCRYPTED VOLUME...",
+            "[OK] CONNECTING TO SECURE G-RPC NODES...",
+            "AUTHENTICATING USER: DHIRAJ JHA...",
+            "MATCH FOUND: PRESIDENTIAL SCHOLAR, FISK UNIVERSITY",
+            "DECRYPTING PORTFOLIO SYSTEM...",
+            "SUCCESS. WELCOME ADMIN."
+        ];
+        
+        const bootContainer = document.getElementById('boot-text-container');
+        const bootScreen = document.getElementById('boot-screen');
+        
+        let lineDelay = 0;
+        bootLines.forEach((text, i) => {
+            const el = document.createElement('div');
+            el.className = 'boot-line';
+            el.innerText = `> ${text}`;
+            bootContainer.appendChild(el);
+            
+            setTimeout(() => {
+                el.style.opacity = 1;
+                // Add a small glitch effect randomly
+                if(Math.random() > 0.5) {
+                    el.classList.add('glitch-hover');
+                }
+            }, lineDelay);
+            
+            lineDelay += Math.random() * 300 + 100; // random typing speed
+        });
+
+        setTimeout(() => {
+            bootScreen.style.transform = 'translateY(-100%)';
+            bootScreen.style.opacity = '0';
+        }, lineDelay + 800);
+
+
+        // CURSOR LOGIC
         const cursorDot = document.getElementById('cursor-dot');
         const cursorRing = document.getElementById('cursor-ring');
         
@@ -394,29 +416,25 @@
             cursorDot.style.top = `${mouseY}px`;
         });
         
-        // Smooth lerp for ring
         const loop = () => {
-            ringX += (mouseX - ringX) * 0.15;
-            ringY += (mouseY - ringY) * 0.15;
+            ringX += (mouseX - ringX) * 0.2;
+            ringY += (mouseY - ringY) * 0.2;
             cursorRing.style.left = `${ringX}px`;
             cursorRing.style.top = `${ringY}px`;
             requestAnimationFrame(loop);
         };
         loop();
 
-        // Magnetic Buttons Effect
+        // MAGNETIC BUTTONS
         const magneticBtns = document.querySelectorAll('.magnetic-btn');
         magneticBtns.forEach(btn => {
             btn.addEventListener('mousemove', (e) => {
                 const rect = btn.getBoundingClientRect();
                 const x = e.clientX - rect.left - rect.width / 2;
                 const y = e.clientY - rect.top - rect.height / 2;
-                
-                // Move button slightly towards mouse
                 gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: 'power2.out' });
-                // Expand cursor
-                cursorRing.style.width = '60px'; cursorRing.style.height = '60px';
-                cursorRing.style.backgroundColor = 'rgba(0, 243, 255, 0.1)';
+                cursorRing.style.width = '70px'; cursorRing.style.height = '70px';
+                cursorRing.style.backgroundColor = 'rgba(0, 243, 255, 0.2)';
             });
             btn.addEventListener('mouseleave', () => {
                 gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.3)' });
@@ -425,20 +443,22 @@
             });
         });
 
-        // Hover effect for links
+        // LINK HOVERS
         document.querySelectorAll('a:not(.magnetic-btn)').forEach(el => {
             el.addEventListener('mouseenter', () => {
-                cursorRing.style.width = '50px'; cursorRing.style.height = '50px';
+                cursorRing.style.width = '60px'; cursorRing.style.height = '60px';
                 cursorRing.style.borderColor = '#b000ff';
+                cursorRing.style.backgroundColor = 'rgba(176, 0, 255, 0.1)';
             });
             el.addEventListener('mouseleave', () => {
                 cursorRing.style.width = '40px'; cursorRing.style.height = '40px';
-                cursorRing.style.borderColor = '#00f3ff';
+                cursorRing.style.borderColor = 'rgba(0, 243, 255, 0.8)';
+                cursorRing.style.backgroundColor = 'transparent';
             });
         });
 
-        // Typewriter Effect
-        const words = ['Distributed Systems.', 'Microservices.', 'Fast Architectures.', 'The Future.'];
+        // TYPEWRITER
+        const words = ['Distributed Systems.', 'Microservices.', 'C++ & Go Architectures.', 'Highly Scalable Events.'];
         let wIdx = 0, charIdx = 0, isDeleting = false;
         const typeEl = document.getElementById('typewriter');
         
@@ -451,36 +471,30 @@
                 typeEl.innerText = current.substring(0, charIdx + 1);
                 charIdx++;
             }
-            
-            let speed = isDeleting ? 50 : 100;
-            if (!isDeleting && charIdx === current.length) {
-                speed = 2000; isDeleting = true;
-            } else if (isDeleting && charIdx === 0) {
-                isDeleting = false; wIdx = (wIdx + 1) % words.length; speed = 500;
-            }
+            let speed = isDeleting ? 30 : 80;
+            if (!isDeleting && charIdx === current.length) { speed = 2500; isDeleting = true; } 
+            else if (isDeleting && charIdx === 0) { isDeleting = false; wIdx = (wIdx + 1) % words.length; speed = 500; }
             setTimeout(typeWriter, speed);
         }
-        setTimeout(typeWriter, 1000);
+        setTimeout(typeWriter, lineDelay + 1000); // Start after boot
 
-        // Canvas Cyber Node Network Background
+        // EXTREMELY INTRACTIVE CANVAS MAP
         const canvas = document.getElementById('network-bg');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
         let particles = [];
         
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
+        window.addEventListener('resize', () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; });
 
         class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
+            constructor(x, y) {
+                this.x = x || Math.random() * width;
+                this.y = y || Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = (Math.random() - 0.5) * 1.5;
                 this.radius = Math.random() * 2 + 1;
+                this.life = 1; // Used for explosions
             }
             update() {
                 this.x += this.vx; this.y += this.vy;
@@ -490,29 +504,46 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0, 243, 255, 0.5)';
+                ctx.fillStyle = `rgba(0, 243, 255, ${this.life * 0.5})`;
                 ctx.fill();
             }
         }
         
-        // Responsive particle count
-        const P_COUNT = window.innerWidth < 768 ? 40 : 100;
+        const P_COUNT = window.innerWidth < 768 ? 60 : 150;
         for(let i=0; i<P_COUNT; i++) particles.push(new Particle());
+
+        // EXPLOSION ON CLICK (Extreme Interactivity)
+        window.addEventListener('click', (e) => {
+            gsap.to(cursorRing, { scale: 1.5, duration: 0.2, yoyo: true, repeat: 1 });
+            
+            // Add a burst of fast particles
+            for(let i=0; i<30; i++) {
+                let p = new Particle(e.clientX, e.clientY);
+                p.vx = (Math.random() - 0.5) * 15;
+                p.vy = (Math.random() - 0.5) * 15;
+                particles.push(p);
+            }
+        });
 
         function animateNodes() {
             ctx.clearRect(0, 0, width, height);
+            
+            // Clean up old explosion particles over time to maintain perf
+            if(particles.length > P_COUNT) {
+                particles.splice(0, particles.length - P_COUNT);
+            }
+
             particles.forEach(p => { p.update(); p.draw(); });
             
-            // Connect nodes & interact with mouse
             for(let i=0; i<particles.length; i++) {
                 for(let j=i; j<particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
                     const dist = Math.sqrt(dx*dx + dy*dy);
                     
-                    if(dist < 120) {
+                    if(dist < 130) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${0.2 - dist/120})`;
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${0.25 - dist/130})`;
                         ctx.lineWidth = 1;
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
@@ -520,17 +551,15 @@
                     }
                 }
                 
-                // Repel from mouse
                 const mdx = particles[i].x - mouseX;
                 const mdy = particles[i].y - mouseY;
                 const mdist = Math.sqrt(mdx*mdx + mdy*mdy);
-                if(mdist < 150) {
-                    particles[i].x += mdx * 0.01;
-                    particles[i].y += mdy * 0.01;
-                    
-                    // Draw laser to mouse
+                if(mdist < 180) {
+                    particles[i].x += mdx * 0.02; // Push away organically
+                    particles[i].y += mdy * 0.02;
                     ctx.beginPath();
-                    ctx.strokeStyle = `rgba(176, 0, 255, ${0.3 - mdist/150})`;
+                    ctx.strokeStyle = `rgba(176, 0, 255, ${0.4 - mdist/180})`;
+                    ctx.lineWidth = 1.5;
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(mouseX, mouseY);
                     ctx.stroke();
@@ -540,37 +569,36 @@
         }
         animateNodes();
 
-        // GSAP Scroll Animations
+        // GSAP Animations
         gsap.registerPlugin(ScrollTrigger);
         
-        gsap.set('.gs-reveal', { y: 40, opacity: 0 });
+        setTimeout(() => {
+            gsap.fromTo('.gs-hero', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 1, stagger: 0.15, ease: 'power3.out' });
+            gsap.fromTo('.gs-fade', { opacity: 0 }, { opacity: 1, duration: 1.5, delay: 0.5 });
+        }, lineDelay + 500); // Wait for boot screen
+        
         ScrollTrigger.batch('.gs-reveal', {
             onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, stagger: 0.15, duration: 1, ease: 'power3.out' }),
             once: true
         });
 
-        gsap.set('.gs-reveal-stagger > div', { y: 50, opacity: 0 });
         ScrollTrigger.batch('.gs-reveal-stagger > div', {
             onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: 'back.out(1.2)' }),
             once: true
         });
         
-        // CSS Animation for timeline pulse line
-        const style = document.createElement('style');
-        style.innerHTML = `
+        const stylePulse = document.createElement('style');
+        stylePulse.innerHTML = `
             @keyframes linePulse {
                 0% { transform: translateY(-100%); opacity: 0; }
                 50% { opacity: 1; }
-                100% { transform: translateY(${document.querySelector('.wrap-timeline')?.offsetHeight || 800}px); opacity: 0; }
+                100% { transform: translateY(${document.querySelector('.wrap-timeline')?.offsetHeight || 1000}px); opacity: 0; }
             }
-            .pulse-line { animation: linePulse 3s infinite linear; }
+            .pulse-line { animation: linePulse 3.5s infinite linear; }
         `;
-        document.head.appendChild(style);
+        document.head.appendChild(stylePulse);
 
-        // Vanilla Tilt initialization for 3D elements
-        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
-            max: 10, speed: 400, perspective: 1000, scale: 1.02
-        });
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), { max: 15, speed: 400, perspective: 1000, scale: 1.05 });
     </script>
 </body>
 </html>
